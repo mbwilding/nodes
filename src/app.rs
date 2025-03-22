@@ -1,19 +1,37 @@
 use crate::nodes::{NodeViewer, Nodes};
 use egui::Id;
 use egui_snarl::Snarl;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Default, serde::Deserialize, serde::Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 #[serde(default)]
 pub struct App {
+    /// The snarl grapth to display
     snarl: Snarl<Nodes>,
+    /// The optional ID of the snarl UI element
     snarl_ui_id: Option<Id>,
-    // Field to store the preset name for saving
-    preset_name: String,
-    // Map of preset name to the snarl (list of nodes) snapshot
-    available_presets: HashMap<String, Snarl<Nodes>>,
-    // Currently selected preset for loading
-    selected_preset: Option<String>,
+    /// Presets manager
+    presets_manager: PresetsManager,
+    /// Window states
+    #[serde(skip)]
+    window_states: WindowStates,
+}
+
+#[derive(Default, Deserialize, Serialize)]
+#[serde(default)]
+pub struct PresetsManager {
+    /// Field to store the preset name for saving
+    name: String,
+    /// Map of preset name to the snarl (list of nodes) snapshot
+    saved: HashMap<String, Snarl<Nodes>>,
+    /// Currently selected preset for loading
+    selected: Option<String>,
+}
+
+#[derive(Default)]
+pub struct WindowStates {
+    presets: bool,
 }
 
 impl App {
@@ -44,44 +62,71 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label("Preset name:");
-                    ui.text_edit_singleline(&mut self.preset_name);
-                    if ui.button("Save preset").clicked() {
-                        if !self.preset_name.is_empty() {
-                            self.available_presets
-                                .insert(self.preset_name.clone(), self.snarl.clone());
-                        }
-                    }
-                });
-
-                ui.separator();
-
-                ui.horizontal(|ui| {
-                    ui.label("Load preset:");
-                    let combo_id = ui.make_persistent_id("load_preset_combo");
-                    egui::ComboBox::new(combo_id, "")
-                        .selected_text(self.selected_preset.as_deref().unwrap_or("Select a preset"))
-                        .show_ui(ui, |ui| {
-                            for preset in self.available_presets.keys() {
-                                ui.selectable_value(
-                                    &mut self.selected_preset,
-                                    Some(preset.clone()),
-                                    preset,
-                                );
-                            }
-                        });
-                    if ui.button("Load preset").clicked() {
-                        if let Some(ref name) = self.selected_preset {
-                            if let Some(preset_snarl) = self.available_presets.get(name) {
-                                // Clone the loaded preset back into snarl.
-                                self.snarl = preset_snarl.clone();
-                            }
-                        }
-                    }
-                });
+                if ui.button("Presets").clicked() {
+                    self.window_states.presets = true;
+                }
             });
         });
+
+        if self.window_states.presets {
+            egui::Window::new("Preset Manager")
+                .open(&mut self.window_states.presets)
+                .show(ctx, |ui| {
+                    // Save section
+                    ui.horizontal(|ui| {
+                        ui.label("Name:");
+                        ui.text_edit_singleline(&mut self.presets_manager.name);
+                        if ui.button("Save").clicked() {
+                            if !self.presets_manager.name.is_empty() {
+                                self.presets_manager
+                                    .saved
+                                    .insert(self.presets_manager.name.clone(), self.snarl.clone());
+                                self.presets_manager.selected =
+                                    Some(self.presets_manager.name.clone());
+                            }
+                        }
+                    });
+
+                    ui.separator();
+
+                    // Load and Delete section
+                    ui.horizontal(|ui| {
+                        ui.label("Preset:");
+                        egui::ComboBox::from_label("")
+                            .selected_text(
+                                self.presets_manager
+                                    .selected
+                                    .as_deref()
+                                    .unwrap_or("Select a preset"),
+                            )
+                            .show_ui(ui, |ui| {
+                                for preset in self.presets_manager.saved.keys() {
+                                    if ui
+                                        .selectable_value(
+                                            &mut self.presets_manager.selected,
+                                            Some(preset.clone()),
+                                            preset,
+                                        )
+                                        .clicked()
+                                    {
+                                        if let Some(preset_snarl) =
+                                            self.presets_manager.saved.get(preset)
+                                        {
+                                            self.snarl = preset_snarl.clone();
+                                            self.presets_manager.name = preset.clone();
+                                        }
+                                    }
+                                }
+                            });
+                        if ui.button("Delete").clicked() {
+                            if let Some(ref name) = self.presets_manager.selected {
+                                self.presets_manager.saved.remove(name);
+                                self.presets_manager.selected = None;
+                            }
+                        }
+                    });
+                });
+        }
 
         egui::CentralPanel::default().show(ctx, |ui| {
             self.snarl_ui_id = Some(ui.id());
