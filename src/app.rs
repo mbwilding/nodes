@@ -16,6 +16,10 @@ impl App {
     pub fn new(cc: &eframe::CreationContext) -> Self {
         egui_extras::install_image_loaders(&cc.egui_ctx);
         cc.egui_ctx.style_mut(|style| style.animation_time *= 1.5);
+        cc.egui_ctx.set_visuals(egui::Visuals {
+            dark_mode: true,
+            ..Default::default()
+        });
 
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
@@ -39,23 +43,23 @@ impl eframe::App for App {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
-
-            egui::menu::bar(ui, |ui| {
-                let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    // egui::widgets::global_theme_preference_switch(ui);
-
-                    ui.menu_button("File", |ui| {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                    });
-                    ui.add_space(16.0);
-                }
-            });
-        });
+        // egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+        //     // The top panel is often a good place for a menu bar:
+        //
+        //     egui::menu::bar(ui, |ui| {
+        //         let is_web = cfg!(target_arch = "wasm32");
+        //         if !is_web {
+        //             // egui::widgets::global_theme_preference_switch(ui);
+        //
+        //             ui.menu_button("File", |ui| {
+        //                 if ui.button("Quit").clicked() {
+        //                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        //                 }
+        //             });
+        //             ui.add_space(16.0);
+        //         }
+        //     });
+        // });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             self.snarl_ui_id = Some(ui.id());
