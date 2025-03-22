@@ -404,6 +404,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -596,12 +605,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "egui-probe"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3eb0383be4a7eff9c7d3c8638c31273e709f17bf3e263f1c9588d961b504185"
+dependencies = [
+ "egui",
+ "egui-probe-proc",
+]
+
+[[package]]
+name = "egui-probe-proc"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7f1716ac3c0e0c8f170192ba928935873dfa52c5636e9eea3fd475b9e7f6bce"
+dependencies = [
+ "convert_case",
+ "proc-easy",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "egui-snarl"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33f9d0444c82253d14d968342581af59d2519325381ea21d8e258c0af18a1422"
 dependencies = [
  "egui",
+ "egui-probe",
  "serde",
  "slab",
 ]
@@ -1967,6 +2000,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8a2f0d8d040d7848a709caf78912debcc3f33ee4b3cac47d73d1e1069e83507"
 dependencies = [
  "portable-atomic",
+]
+
+[[package]]
+name = "proc-easy"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ea59c637cd0e6b71ae18e589854e9de9b7cb17fefdbf2047e42bd38e24285b19"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

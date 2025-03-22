@@ -2,9 +2,9 @@
 
 use std::collections::HashMap;
 
-use egui::{Color32, Ui};
+use egui::{Color32, Ui, Vec2};
 use egui_snarl::{
-    ui::{AnyPins, NodeLayout, PinInfo, PinPlacement, SnarlStyle, SnarlViewer, WireStyle},
+    ui::{AnyPins, BackgroundPattern, Grid, NodeLayout, PinInfo, PinPlacement, SnarlStyle, SnarlViewer, WireStyle},
     InPin, InPinId, NodeId, OutPin, OutPinId, Snarl,
 };
 
@@ -12,6 +12,38 @@ const STRING_COLOR: Color32 = Color32::from_rgb(0x00, 0xb0, 0x00);
 const NUMBER_COLOR: Color32 = Color32::from_rgb(0xb0, 0x00, 0x00);
 const IMAGE_COLOR: Color32 = Color32::from_rgb(0xb0, 0x00, 0xb0);
 const UNTYPED_COLOR: Color32 = Color32::from_rgb(0xb0, 0xb0, 0xb0);
+
+pub const fn snarl_style() -> SnarlStyle {
+    SnarlStyle {
+        node_layout: Some(NodeLayout::FlippedSandwich),
+        pin_placement: Some(PinPlacement::Edge),
+        pin_size: Some(7.0),
+        node_frame: Some(egui::Frame {
+            inner_margin: egui::Margin::same(8),
+            outer_margin: egui::Margin {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 4,
+            },
+            corner_radius: egui::CornerRadius::same(8),
+            fill: egui::Color32::from_gray(30),
+            stroke: egui::Stroke::NONE,
+            shadow: egui::Shadow::NONE,
+        }),
+        // bg_frame: None,
+        bg_frame: Some(egui::Frame {
+            inner_margin: egui::Margin::same(2),
+            outer_margin: egui::Margin::ZERO,
+            corner_radius: egui::CornerRadius::ZERO,
+            fill: egui::Color32::from_gray(0),
+            stroke: egui::Stroke::NONE,
+            shadow: egui::Shadow::NONE,
+        }),
+        bg_pattern: Some(BackgroundPattern::Grid(Grid::new(Vec2::new(50., 50.), 1.))),
+        ..SnarlStyle::new()
+    }
+}
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub enum Nodes {
@@ -929,36 +961,6 @@ impl Expr {
             let lhs = Self::BinOp { lhs, op, rhs };
             Self::parse_binop(Box::new(lhs), next_op, input)
         }
-    }
-}
-
-pub const fn snarl_style() -> SnarlStyle {
-    SnarlStyle {
-        node_layout: Some(NodeLayout::FlippedSandwich),
-        pin_placement: Some(PinPlacement::Edge),
-        pin_size: Some(7.0),
-        node_frame: Some(egui::Frame {
-            inner_margin: egui::Margin::same(8),
-            outer_margin: egui::Margin {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 4,
-            },
-            corner_radius: egui::CornerRadius::same(8),
-            fill: egui::Color32::from_gray(30),
-            stroke: egui::Stroke::NONE,
-            shadow: egui::Shadow::NONE,
-        }),
-        bg_frame: Some(egui::Frame {
-            inner_margin: egui::Margin::same(2),
-            outer_margin: egui::Margin::ZERO,
-            corner_radius: egui::CornerRadius::ZERO,
-            fill: egui::Color32::from_gray(40),
-            stroke: egui::Stroke::NONE,
-            shadow: egui::Shadow::NONE,
-        }),
-        ..SnarlStyle::new()
     }
 }
 
