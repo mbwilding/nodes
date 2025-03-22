@@ -20,8 +20,6 @@ impl App {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
-        // Load previous app state (if any).
-        // Note that you must enable the `persistence` feature for this to work.
         if let Some(storage) = cc.storage {
             return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
@@ -45,10 +43,10 @@ impl eframe::App for App {
             // The top panel is often a good place for a menu bar:
 
             egui::menu::bar(ui, |ui| {
-                egui::widgets::global_theme_preference_switch(ui);
-
                 let is_web = cfg!(target_arch = "wasm32");
                 if !is_web {
+                    // egui::widgets::global_theme_preference_switch(ui);
+
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
