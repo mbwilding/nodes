@@ -2,9 +2,12 @@
 
 use std::collections::HashMap;
 
-use egui::{Color32, Ui, Vec2};
+use egui::{Color32, Stroke, Ui, Vec2};
 use egui_snarl::{
-    ui::{AnyPins, BackgroundPattern, Grid, NodeLayout, PinInfo, PinPlacement, SnarlStyle, SnarlViewer, WireStyle},
+    ui::{
+        AnyPins, BackgroundPattern, Grid, NodeLayout, PinInfo, PinPlacement, SnarlStyle,
+        SnarlViewer, WireStyle,
+    },
     InPin, InPinId, NodeId, OutPin, OutPinId, Snarl,
 };
 
@@ -15,9 +18,10 @@ const UNTYPED_COLOR: Color32 = Color32::from_rgb(0xb0, 0xb0, 0xb0);
 
 pub const fn snarl_style() -> SnarlStyle {
     SnarlStyle {
-        node_layout: Some(NodeLayout::FlippedSandwich),
+        node_layout: Some(NodeLayout::Basic),
         pin_placement: Some(PinPlacement::Edge),
-        pin_size: Some(7.0),
+        pin_size: Some(12.0),
+        pin_stroke: Some(Stroke::NONE),
         node_frame: Some(egui::Frame {
             inner_margin: egui::Margin::same(8),
             outer_margin: egui::Margin {
