@@ -7,15 +7,27 @@ use std::collections::HashMap;
 #[derive(Default, Deserialize, Serialize)]
 #[serde(default)]
 pub struct App {
-    /// The snarl grapth to display
-    snarl: Snarl<Nodes>,
-    /// The optional ID of the snarl UI element
-    snarl_ui_id: Option<Id>,
+    /// Snarl state
+    snarl_state: SnarlState,
     /// Presets manager
     presets_manager: PresetsManager,
     /// Window states
     #[serde(skip)]
-    window_states: WindowStates,
+    window_state: WindowState,
+}
+
+#[derive(Default, Deserialize, Serialize)]
+#[serde(default)]
+pub struct SnarlState {
+    /// The snarl graph to display
+    snarl: Snarl<Nodes>,
+    /// The optional ID of the snarl UI element
+    ui_id: Option<Id>,
+}
+
+#[derive(Default)]
+pub struct WindowState {
+    presets: bool,
 }
 
 #[derive(Default, Deserialize, Serialize)]
@@ -27,11 +39,6 @@ pub struct PresetsManager {
     saved: HashMap<String, Snarl<Nodes>>,
     /// Currently selected preset for loading
     selected: Option<String>,
-}
-
-#[derive(Default)]
-pub struct WindowStates {
-    presets: bool,
 }
 
 impl App {
@@ -63,27 +70,25 @@ impl eframe::App for App {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
                 if ui.button("Presets").clicked() {
-                    self.window_states.presets = true;
+                    self.window_state.presets = true;
                 }
             });
         });
 
-        if self.window_states.presets {
+        if self.window_state.presets {
             egui::Window::new("Preset Manager")
-                .open(&mut self.window_states.presets)
+                .open(&mut self.window_state.presets)
                 .show(ctx, |ui| {
                     // Save section
                     ui.horizontal(|ui| {
                         ui.label("Name:");
                         ui.text_edit_singleline(&mut self.presets_manager.name);
-                        if ui.button("Save").clicked() {
-                            if !self.presets_manager.name.is_empty() {
-                                self.presets_manager
-                                    .saved
-                                    .insert(self.presets_manager.name.clone(), self.snarl.clone());
-                                self.presets_manager.selected =
-                                    Some(self.presets_manager.name.clone());
-                            }
+                        if ui.button("Save").clicked() && !self.presets_manager.name.is_empty() {
+                            self.presets_manager.saved.insert(
+                                self.presets_manager.name.clone(),
+                                self.snarl_state.snarl.clone(),
+                            );
+                            self.presets_manager.selected = Some(self.presets_manager.name.clone());
                         }
                     });
 
@@ -112,7 +117,7 @@ impl eframe::App for App {
                                         if let Some(preset_snarl) =
                                             self.presets_manager.saved.get(preset)
                                         {
-                                            self.snarl = preset_snarl.clone();
+                                            self.snarl_state.snarl = preset_snarl.clone();
                                             self.presets_manager.name = preset.clone();
                                         }
                                     }
@@ -129,8 +134,9 @@ impl eframe::App for App {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            self.snarl_ui_id = Some(ui.id());
-            self.snarl
+            self.snarl_state.ui_id = Some(ui.id());
+            self.snarl_state
+                .snarl
                 .show(&mut NodeViewer, &crate::nodes::snarl_style(), "snarl", ui);
         });
     }
