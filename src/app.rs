@@ -70,7 +70,7 @@ impl eframe::App for App {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
                 if ui.button("Presets").clicked() {
-                    self.window_state.presets = true;
+                    self.window_state.presets = !self.window_state.presets;
                 }
             });
         });
