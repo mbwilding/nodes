@@ -10,7 +10,7 @@ pub struct App {
     snarl_ui_id: Option<Id>,
 
     // #[serde(skip)]
-    value: f32,
+    // value: f32,
 }
 
 impl Default for App {
