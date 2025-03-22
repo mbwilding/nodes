@@ -10,7 +10,7 @@ pub struct App {
     snarl_ui_id: Option<Id>,
 
     // #[serde(skip)]
-    // value: f32,
+    value: f32,
 }
 
 impl Default for App {
@@ -19,6 +19,8 @@ impl Default for App {
             snarl: Default::default(),
             style: crate::nodes::snarl_style(),
             snarl_ui_id: None,
+
+            value: 1.0,
         }
     }
 }
@@ -35,7 +37,16 @@ impl App {
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
         if let Some(storage) = cc.storage {
-            return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
+            let storage_opt = eframe::get_value(storage, eframe::APP_KEY);
+            match storage_opt {
+                Some(storage) => {
+                    return storage;
+                }
+                None => {
+                    println!("No state available, using default");
+                }
+            }
+            return storage_opt.unwrap_or_default();
         }
 
         Default::default()
@@ -72,6 +83,8 @@ impl eframe::App for App {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("Value"));
+
             self.snarl_ui_id = Some(ui.id());
             self.snarl.show(&mut NodeViewer, &self.style, "snarl", ui);
         });
