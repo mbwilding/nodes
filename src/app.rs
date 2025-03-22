@@ -2,23 +2,13 @@ use crate::nodes::{NodeViewer, Nodes};
 use egui::Id;
 use egui_snarl::Snarl;
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Default, serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct App {
     snarl: Snarl<Nodes>,
     snarl_ui_id: Option<Id>,
-
     // #[serde(skip)]
     // value: f32,
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            snarl: Default::default(),
-            snarl_ui_id: None,
-        }
-    }
 }
 
 impl App {
@@ -71,7 +61,8 @@ impl eframe::App for App {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             self.snarl_ui_id = Some(ui.id());
-            self.snarl.show(&mut NodeViewer, &crate::nodes::snarl_style(), "snarl", ui);
+            self.snarl
+                .show(&mut NodeViewer, &crate::nodes::snarl_style(), "snarl", ui);
         });
     }
 }

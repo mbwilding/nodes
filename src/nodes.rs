@@ -154,10 +154,7 @@ impl SnarlViewer<Nodes> for NodeViewer {
     fn outputs(&mut self, node: &Nodes) -> usize {
         match node {
             Nodes::Sink => 0,
-            Nodes::Number(_)
-            | Nodes::String(_)
-            | Nodes::ShowImage(_)
-            | Nodes::ExprNode(_) => 1,
+            Nodes::Number(_) | Nodes::String(_) | Nodes::ShowImage(_) | Nodes::ExprNode(_) => 1,
         }
     }
 
@@ -542,11 +539,7 @@ impl SnarlViewer<Nodes> for NodeViewer {
                 });
 
                 let dst_out_candidates = [
-                    (
-                        "Number",
-                        (|| Nodes::Number(0.)) as fn() -> Nodes,
-                        PIN_NUM,
-                    ),
+                    ("Number", (|| Nodes::Number(0.)) as fn() -> Nodes, PIN_NUM),
                     ("String", || Nodes::String(String::new()), PIN_STR),
                     ("Expr", || Nodes::ExprNode(ExprNode::new()), PIN_NUM),
                     ("Show Image", || Nodes::ShowImage(String::new()), PIN_IMG),
