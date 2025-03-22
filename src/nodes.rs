@@ -31,7 +31,6 @@ pub const fn snarl_style() -> SnarlStyle {
             stroke: egui::Stroke::NONE,
             shadow: egui::Shadow::NONE,
         }),
-        // bg_frame: None,
         bg_frame: Some(egui::Frame {
             inner_margin: egui::Margin::same(2),
             outer_margin: egui::Margin::ZERO,
